@@ -20,9 +20,7 @@ SCREEN_ROWS = 224
 SCREEN_COLUMNS = 320
 COLOR_CHANNELS = 3
 NUMBER_OF_OBSERVATIONS = SCREEN_ROWS * SCREEN_COLUMNS * COLOR_CHANNELS
-MIN_OBSERVATION = 0
-MAX_OBSERVATION = 255
-BITS_PER_OBSERVATION = 256 #Md5 has a digest of 256 bits
+BITS_PER_OBSERVATION = 128 #Md5 has a digest size of 128 bits
 
 #ACTION DATA
 BITS_PER_ACTION = 12
@@ -52,11 +50,11 @@ def computeNeuralNetworkInput(myObservation, myNeuralNetwork):
 	myBitArrayIndex = 0;
 	neuralNetworkInputIndex = 0
 	
-	for height in range(SCREEN_ROWS):
-		for width in range(SCREEN_COLUMNS):
+	for row in range(SCREEN_ROWS):
+		for column in range(SCREEN_COLUMNS):
 			for channel in range(COLOR_CHANNELS):
 
-				myMd5.update(myObservation[height][width][channel])
+				myMd5.update(myObservation[row][column][channel])
 
 	print("Pixel digest:", myMd5.hexdigest())
 
