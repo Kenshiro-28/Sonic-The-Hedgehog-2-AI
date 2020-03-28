@@ -9,7 +9,7 @@ import math
 import array
 import sys
 import time
-import hashlib
+import cv2
 
 from ctypes import *
 so_file = "/usr/local/lib/libT-Rex.so"
@@ -18,14 +18,13 @@ tRex = CDLL(so_file)
 #OBSERVATION DATA
 SCREEN_ROWS = 224
 SCREEN_COLUMNS = 320
-COLOR_CHANNELS = 3
-BITS_PER_OBSERVATION = 128 #Md5 has a digest size of 128 bits
+SKIPPED_PIXELS = 5
 
 #ACTION DATA
 BITS_PER_ACTION = 12
 
 #NEURAL NETWORK DATA
-NEURAL_NETWORK_NUMBER_OF_INPUTS = BITS_PER_OBSERVATION
+NEURAL_NETWORK_NUMBER_OF_INPUTS = int((SCREEN_ROWS * SCREEN_COLUMNS) / (1 + SKIPPED_PIXELS))
 NEURAL_NETWORK_NUMBER_OF_HIDDEN_LAYERS = 2
 NEURAL_NETWORK_NUMBER_OF_OUTPUTS = BITS_PER_ACTION
 
@@ -43,33 +42,30 @@ def computeNeuralNetworkInput(myObservation, myNeuralNetwork):
 	
 	myBitArray = array.array('i',(0 for i in range(0, NEURAL_NETWORK_NUMBER_OF_INPUTS)))
 
-	myMd5 = hashlib.md5()
-
 	returnValue = 0
 	myBitArrayIndex = 0;
 	neuralNetworkInputIndex = 0
+
+	edges = cv2.Canny(myObservation,100,200)
+
+	row = 0
 	
-	for row in range(SCREEN_ROWS):
-		for column in range(SCREEN_COLUMNS):
-			for channel in range(COLOR_CHANNELS):
+	while row < SCREEN_ROWS:
 
-				myMd5.update(myObservation[row][column][channel])
+		column = 0
 
-	print("Pixel digest:", myMd5.hexdigest())
+		while column < SCREEN_COLUMNS:
 
-	digest = myMd5.digest()
-
-	for byte in range(myMd5.digest_size):
-		for i in reversed(range(7)):
-
-			bit = digest[byte] >> i
-
-			if (bit & 1):
+			if (edges[row][column] == 255):
 				myBitArray[myBitArrayIndex] = 1
 			else:
 				myBitArray[myBitArrayIndex] = 0
 
 			myBitArrayIndex += 1
+
+			column += 1 + SKIPPED_PIXELS
+
+		row += 1 + SKIPPED_PIXELS
 
 	while neuralNetworkInputIndex < NEURAL_NETWORK_NUMBER_OF_INPUTS and returnValue==0:
 	
