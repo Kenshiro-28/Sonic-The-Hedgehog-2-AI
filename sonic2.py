@@ -1,3 +1,13 @@
+'''
+=====================================================================================
+Name        : Sonic The Hedgehog 2 AI
+Author      : Kenshiro
+Version     : 1.00
+Copyright   : GNU General Public License (GPLv3)
+Description : Sonic The Hedgehog 2 AI based on the T-Rex evolutionary neural network
+=====================================================================================
+'''
+
 #Action space: MultiBinary(12)
 #Observation space: Box(224, 320, 3)
 #Observation high: 255, low: 0
