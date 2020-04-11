@@ -1,4 +1,4 @@
-# Street Fighter II: Champion Edition AI
+# Sonic The Hedgehog 2 AI
 
 This is a Sonic The Hedgehog 2 artificial intelligence based on the T-Rex evolutionary neural network. It trains playing the game until it's unable to improve its best score. After completing the training, the program plays a last game rendering the game screen.
 
