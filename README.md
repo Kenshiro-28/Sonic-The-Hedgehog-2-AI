@@ -45,20 +45,20 @@ https://github.com/Kenshiro-28/T-Rex
 
 Copy the generated file **libT-Rex.so** in the folder /usr/local/lib
 
+### Python
+
+Run this command to install Python:
+
+```
+$ sudo apt install python3-dev python3-pip python3-wheel python3-opencv
+```
+
 ### OpenAI Gym Retro
 
 Run this command to install OpenAI Gym Retro:
 
 ```
 $ pip3 install gym-retro
-```
-
-### OpenCV
-
-Run this command to install OpenCV:
-
-```
-$ pip3 install opencv-python
 ```
 
 ### Game ROM
