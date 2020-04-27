@@ -25,11 +25,11 @@ Main features:
 
 ### Input layer
 
-The input of the neural network is the screen output of the Sega Genesis console. The original image is processed with Canny edge detection to extract useful structural information and dramatically reduce the amount of data to be processed. Finally, the image resolution is reduced to one sixth of its original size. The input layer has 11946 neurons.
+The input of the neural network is the screen output of the Sega Genesis console. The original image is processed with Canny edge detection to extract useful structural information and dramatically reduce the amount of data to be processed. The first 44 lines of the screen are ignored to further reduce the amount of data. Finally, the image resolution is reduced to one sixth of its original size. The input layer has 9600 neurons.
 
 ### Hidden layers
 
-The neural network has 2 hidden layers. The T-Rex architecture states that the number of neurons in each hidden layer is set as the number of input neurons so they have 11946 neurons.
+The neural network has 2 hidden layers. The T-Rex architecture states that the number of neurons in each hidden layer is set as the number of input neurons so they have 9600 neurons.
 
 ### Output layer
 
