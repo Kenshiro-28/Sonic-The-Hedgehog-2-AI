@@ -36,11 +36,11 @@ BITS_PER_ACTION = 12
 
 #NEURAL NETWORK DATA
 NEURAL_NETWORK_NUMBER_OF_INPUTS = int(((SCREEN_ROWS - SKIPPED_ROWS) * SCREEN_COLUMNS) / (1 + SKIPPED_PIXELS))
-NEURAL_NETWORK_NUMBER_OF_HIDDEN_LAYERS = 2
+NEURAL_NETWORK_NUMBER_OF_HIDDEN_LAYERS = 10
 NEURAL_NETWORK_NUMBER_OF_OUTPUTS = BITS_PER_ACTION
 
 #Number of consecutive victories to consider the training completed
-MAX_CONSECUTIVE_VICTORIES = (NEURAL_NETWORK_NUMBER_OF_INPUTS * NEURAL_NETWORK_NUMBER_OF_HIDDEN_LAYERS + NEURAL_NETWORK_NUMBER_OF_OUTPUTS) * 10
+MAX_CONSECUTIVE_VICTORIES = NEURAL_NETWORK_NUMBER_OF_INPUTS * NEURAL_NETWORK_NUMBER_OF_HIDDEN_LAYERS + NEURAL_NETWORK_NUMBER_OF_OUTPUTS
 
 NEURAL_NETWORK_FILE_LOAD_ERROR = -10
 NEURAL_NETWORK_ERROR_CODE = -12
@@ -131,55 +131,64 @@ while consecutiveVictories < MAX_CONSECUTIVE_VICTORIES and returnValue==0 and no
 	reward = 0;
 	episode += 1
 
+	repeatAction = False
+
 	while returnValue==0:
 		c_int_p = POINTER(c_int)
 		myOutputArray = c_int_p()
 		myOutputArraySize = c_int()
-			
+
 		#print(observation)
 
-		returnValue = computeNeuralNetworkInput(observation, neuralNetworkClone)
+		if not repeatAction:
+			repeatAction = True
 
-		if returnValue==0:
-			returnValue = tRex.computeNeuralNetworkOutput(neuralNetworkClone, byref(myOutputArray), byref(myOutputArraySize))
+			returnValue = computeNeuralNetworkInput(observation, neuralNetworkClone)
 
-		if returnValue==0 and myOutputArraySize.value!=NEURAL_NETWORK_NUMBER_OF_OUTPUTS:
-			returnValue = NEURAL_NETWORK_ERROR_CODE
+			if returnValue==0:
+				returnValue = tRex.computeNeuralNetworkOutput(neuralNetworkClone, byref(myOutputArray), byref(myOutputArraySize))
 
-		if returnValue==0:
-			action = parseNeuralNetworkOutput(myOutputArray, myOutputArraySize.value)
-			observation, newReward, done, info = env.step(action)
-#			env.render()
+			if returnValue==0 and myOutputArraySize.value!=NEURAL_NETWORK_NUMBER_OF_OUTPUTS:
+				returnValue = NEURAL_NETWORK_ERROR_CODE
 
-			reward += newReward
+			if returnValue==0:
+				action = parseNeuralNetworkOutput(myOutputArray, myOutputArraySize.value)
+		else:
+			repeatAction = False
 
-			print("Reward:", reward)
-			print("Best reward:", bestReward)
-			print("Action:", action)
-			print("Episode:", episode)
+		observation, newReward, done, info = env.step(action)
 
-			if done:
+#		env.render()
 
-				if reward > bestReward:
+		reward += newReward
+
+		print("Reward:", reward)
+		print("Best reward:", bestReward)
+		print("Action:", action)
+		print("Episode:", episode)
+
+		if done:
+
+			if reward > bestReward:
 				
-					auxNeuralNetwork = bestNeuralNetwork
-					bestNeuralNetwork = neuralNetworkClone
-					neuralNetworkClone = auxNeuralNetwork
+				auxNeuralNetwork = bestNeuralNetwork
+				bestNeuralNetwork = neuralNetworkClone
+				neuralNetworkClone = auxNeuralNetwork
 
-					consecutiveVictories = 0
-					bestReward = reward
-				else:
-					consecutiveVictories += 1
+				consecutiveVictories = 0
+				bestReward = reward
+			else:
+				consecutiveVictories += 1
 
-				returnValue = tRex.cloneNeuralNetwork(bestNeuralNetwork, neuralNetworkClone)
+			returnValue = tRex.cloneNeuralNetwork(bestNeuralNetwork, neuralNetworkClone)
 
-				if returnValue==0:
-					returnValue = tRex.mutateNeuralNetwork(neuralNetworkClone)
+			if returnValue==0:
+				returnValue = tRex.mutateNeuralNetwork(neuralNetworkClone)
 			
-				print("Episode finished")
-				break
+			print("Episode finished")
+			break
 
-			print("Consecutive victories:", consecutiveVictories, "/", MAX_CONSECUTIVE_VICTORIES)	
+		print("Consecutive victories:", consecutiveVictories, "/", MAX_CONSECUTIVE_VICTORIES)	
 
 #Destroy the neural network clone
 if returnValue==0:
